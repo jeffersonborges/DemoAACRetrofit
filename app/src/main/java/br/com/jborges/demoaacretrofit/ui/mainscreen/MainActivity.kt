@@ -16,19 +16,27 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        
+
         mainViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
 
-        btPesquisar.setOnClickListener{
-            mainViewModel.pesquisarEndereco(etCep.text.toString())
+        btPesquisar.setOnClickListener {
+            if (etCep.text != null)
+                mainViewModel.pesquisarEndereco(etCep.text.toString())
         }
 
-        mainViewModel.apiResponse.observe(this, Observer {
-            apiResponse ->
-            if (apiResponse?.erro == null){
+        mainViewModel.apiResponse.observe(this, Observer { apiResponse ->
+            val end = apiResponse?.endereco
+            if (apiResponse?.erro == null) {
+                tvResultado.text =
+                        "Logadouro: ${end?.logradouro}\n" +
+                                "Complemento: ${end?.complemento}\n" +
+                                "Bairro: ${end?.bairro}\n" +
+                                "Localidade: ${end?.localidade}\n" +
+                                "UF: ${end?.uf}"
+
                 Log.i("TAG", "SUCESSO")
             } else {
-                Log.i("TAG", "ERRO")
+                Log.i("TAG", "ERRO${apiResponse.erro}")
             }
         })
     }
